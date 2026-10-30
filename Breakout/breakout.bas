@@ -3,7 +3,7 @@
    rem
    rem  Joystick in port 0:  LEFT/RIGHT move paddle, FIRE serves
    rem  Game Reset switch restarts the game
-   rem  3 balls, 4 rows of bricks, ball speeds up on level 3+
+   rem  3 balls, 8 brick layouts played in order, ball speeds up on level 3+
    rem ==========================================================
 
    set kernel_options pfcolors
@@ -31,28 +31,15 @@
    dim cx=m                : rem cell column for killcell
    dim cy=n                : rem cell row for killcell
    dim tmp=o
+   dim layout=p            : rem next brick layout to load (0-7)
 
 init
    score=0
    lives=96                : rem 3 balls
    level=1
    spd=1
-
-newlevel
-   playfield:
-   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-   X..............................X
-   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
-   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
-   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
-   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
-   X..............................X
-   X..............................X
-   X..............................X
-   X..............................X
-   X..............................X
-   X..............................X
-end
+   layout=0
+   pfclear
 
    pfcolors:
    $0C
@@ -79,10 +66,176 @@ end
    CTRLPF=$21              : rem reflected playfield, 4 px wide ball
    ballheight=4
    scorecolor=$1E
-
-   bricks=112              : rem 4 rows x 28 columns
    player0x=64
    player0y=paddley
+   AUDV0=0
+
+newlevel
+   rem ----- load the next layout in sequence -----
+   if layout=0 then goto layout0
+   if layout=1 then goto layout1
+   if layout=2 then goto layout2
+   if layout=3 then goto layout3
+   if layout=4 then goto layout4
+   if layout=5 then goto layout5
+   if layout=6 then goto layout6
+   if layout=7 then goto layout7
+
+   rem ---- layout 0: Classic - four solid rows (112 bricks) ----
+layout0
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=112
+   goto layoutdone
+
+   rem ---- layout 1: Checkerboard (56 bricks) ----
+layout1
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.X.X.X.X.X.X.X.X.X.X.X.X.X.X..X
+   X..X.X.X.X.X.X.X.X.X.X.X.X.X.X.X
+   X.X.X.X.X.X.X.X.X.X.X.X.X.X.X..X
+   X..X.X.X.X.X.X.X.X.X.X.X.X.X.X.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=56
+   goto layoutdone
+
+   rem ---- layout 2: Pyramid (76 bricks) ----
+layout2
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X...........XXXXXXXX...........X
+   X.......XXXXXXXXXXXXXXXX.......X
+   X...XXXXXXXXXXXXXXXXXXXXXXXX...X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=76
+   goto layoutdone
+
+   rem ---- layout 3: Vertical bars (84 bricks) ----
+layout3
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXX.XXX.XXX.XXX.XXX.XXX.XXX..X
+   X.XXX.XXX.XXX.XXX.XXX.XXX.XXX..X
+   X.XXX.XXX.XXX.XXX.XXX.XXX.XXX..X
+   X.XXX.XXX.XXX.XXX.XXX.XXX.XXX..X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=84
+   goto layoutdone
+
+   rem ---- layout 4: Fortress - hollow middle (72 bricks) ----
+layout4
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X.XXXX....................XXXX.X
+   X.XXXX....................XXXX.X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=72
+   goto layoutdone
+
+   rem ---- layout 5: Diagonal stripes (84 bricks) ----
+layout5
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXX.XXX.XXX.XXX.XXX.XXX.XXX..X
+   X..XXX.XXX.XXX.XXX.XXX.XXX.XXX.X
+   X.X.XXX.XXX.XXX.XXX.XXX.XXX.XX.X
+   X.XX.XXX.XXX.XXX.XXX.XXX.XXX.X.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=84
+   goto layoutdone
+
+   rem ---- layout 6: Bands with gaps (84 bricks) ----
+layout6
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X.XXXX....XXXX....XXXX....XXXX.X
+   X.....XXXX....XXXX....XXXX.....X
+   X.XXXXXXXXXXXXXXXXXXXXXXXXXXXX.X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=84
+   goto layoutdone
+
+   rem ---- layout 7: Chevron (28 bricks) ----
+layout7
+   playfield:
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   X..............................X
+   X.XXXX....................XXXX.X
+   X.....XXXX............XXXX.....X
+   X.........XXXX....XXXX.........X
+   X.............XXXX.............X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+   X..............................X
+end
+   bricks=28
+   goto layoutdone
+
+layoutdone
+   layout=layout+1 : layout=layout&7   : rem advance, wrapping 7 -> 0
+   player0x=64
    serving=1
    snd=0
    AUDV0=0
@@ -124,13 +277,14 @@ playing
 
    rem ----- ball bounced off the paddle -----
 paddlehit
-   if bdy>128 then return  : rem already travelling upward
+   if bdy>128 then goto paddledone  : rem already travelling upward
    bdy=0-spd
    tmp=ballx-player0x
    if tmp>200 then tmp=0   : rem ball clipped the paddle's left edge
    if tmp<11 then bdx=0-spd
    if tmp>20 then bdx=spd
    AUDC0=12 : AUDF0=20 : AUDV0=8 : snd=3
+paddledone
    return
 
    rem ----- ball touched walls and/or bricks -----
@@ -156,11 +310,12 @@ pfhit
    return
 
 killcell
-   if cx<1 then return
-   if cx>30 then return
-   if cy<1 then return
-   if cy>5 then return
+   if cx<1 then goto killdone
+   if cx>30 then goto killdone
+   if cy<1 then goto killdone
+   if cy>5 then goto killdone
    if pfread(cx,cy) then goto brickgone
+killdone
    return
 brickgone
    pfpixel cx cy off
@@ -178,7 +333,7 @@ lostball
    serving=1
    goto main
 
-   rem ----- cleared the board -----
+   rem ----- cleared the board: next level, next layout -----
 levelup
    level=level+1
    score=score+100
